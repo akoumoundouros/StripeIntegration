@@ -1,0 +1,93 @@
+﻿@model StripeIntegration.Models.ViewModels.HomeViewModel
+@using System.Web.Optimization
+
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<h2 class="text-danger text-uppercase">Home</h2>
+
+<div class="container">
+    <h3>Card Details</h3>
+    <form name="cardDetails" id="purchaseForm" method="post">
+        <div class="row">
+            <div class="form-group ccDetails col-md-4">
+                <label for="CardHolderName">Name as it appears on the card<span class="required">*</span></label>
+                @Html.TextBoxFor(m => m.CardHolderName, new { id = "txtCardHolderName", @class = "form-control" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group ccDetails col-md-4">
+                <label for="CardNumber">Card number<span class="required">*</span></label>
+                <input type="text" name="CardNumber" id="txtCardNumber" placeholder="Card Number e.g 1234..." class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group ccDetails col-md-2">
+                <div><label for="expired">Expiry date<span class="required">*</span></label></div>
+                <select name="ExpiryMonth" id="txtExpiryMonth" class="form-control">
+                    @for (var i = 01; i < 13; i++)
+                    {
+                        <option value="@i.ToString("00")">@i.ToString("00")</option>
+                    }
+                </select>
+                <select name="ExpiryYear" id="txtExpiryYear" class="form-control">
+                    @{
+                        for (int i = DateTime.UtcNow.Year; i <= DateTime.UtcNow.Year + 15; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    }
+                </select>
+                <input type="hidden" name="expired" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                <div class="form-group ccDetails">
+                    <label for="ccDetails.ccv">CCV<span class="required">*</span></label>
+                    <input type="text" name="Cvc" id="txtCvc" placeholder="e.g 987" class="form-control" />
+                    <div class="formHint">
+                        3 digit code on the back of your card
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <input onclick="getStripeToken()" value="Purchase" class="btn btn-danger" id="sendQuery" />
+        </div>
+        @Html.HiddenFor(m => m.stripeToken, new { id = "hdnToken" })
+    </form>
+</div>
+
+<!-- Stripe Request Handler -->
+<script type="text/javascript">
+    Stripe.setPublishableKey("@StripeIntegration.Services.AppConfig.stripePublicKey");
+    var $form = $('#purchaseForm');
+
+    function getStripeToken() {
+        $('#sendQuery').attr('value', 'Processing');
+        $('#sendQuery').attr('disabled', 'disabled');
+        Stripe.card.createToken({
+            name: $('#txtCardHolderName').val(),
+            number: $('#txtCardNumber').val(),
+            cvc: $('#txtCvc').val(),
+            exp_month: $('#txtExpiryMonth').val(),
+            exp_year: $('#txtExpiryYear').val()
+        }, stripeResponseHandler);
+    };
+
+    function stripeResponseHandler(status, response) {
+        if (response.error) {
+            // Show the errors on the form
+            alert(response.error.message);
+            $('#sendQuery').removeAttr("disabled");
+            $('#sendQuery').attr('value', button);
+        } else {
+            // response contains id and card, which contains additional card details
+            var token = response.id;
+            // Insert the token into the form so it gets submitted to the server
+            $('#hdnToken').val(token);
+            // and submit
+            $form.get(0).submit();
+        }
+    }
+</script>
