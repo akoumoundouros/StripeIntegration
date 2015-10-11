@@ -1,9 +1,38 @@
 ﻿@model StripeIntegration.Models.ViewModels.HomeViewModel
 @using System.Web.Optimization
+@using System.Globalization
 
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 
 <h2 class="text-danger text-uppercase">Home</h2>
+
+<div class="container">
+    <h3>Product List</h3>
+    <div class="row col-md-4">
+        <table class="table table-bordered">
+            @foreach (var product in Model.products)
+            {
+                <tr>
+                    <td>
+                        <button class="btn btn-default product" id="@product.name-@product.price">
+                            <span class="glyphicon glyphicon-list-alt"></span>
+                            @product.name
+                            @string.Format(new CultureInfo("en-us"), "{0:C}", (decimal)product.price / 100)
+                        </button>
+                    </td>
+                </tr>
+            }
+        </table>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="alert alert-info" role="alert">
+                    <span class='glyphicon glyphicon-shopping-cart'></span>
+                    <span id="displayPrice"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container">
     <h3>Card Details</h3>
@@ -55,6 +84,8 @@
             <input onclick="getStripeToken()" value="Purchase" class="btn btn-danger" id="sendQuery" />
         </div>
         @Html.HiddenFor(m => m.cardDetails.stripeToken, new { id = "hdnToken" })
+        @Html.HiddenFor(m => m.cardDetails.price, new { id = "price" })
+        @Html.HiddenFor(m => m.cardDetails.description, new {id="description"})
     </form>
 </div>
 
@@ -70,7 +101,7 @@
                     {
                         <tr>
                             <td>@item.Description</td>
-                            <td>@string.Format("${0:n}", item.Amount / 100)</td>
+                            <td>@string.Format(new CultureInfo("en-us"),"{0:C}", (decimal)item.Amount / 100)</td>
                         </tr>
                     }
                 </table>
@@ -112,4 +143,17 @@
             $form.get(0).submit();
         }
     }
+</script>
+
+<!-- Product selection, unsafe -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".product").click(function () {
+            var price = this.id.substring(this.id.indexOf("-") + 1);
+            var desc = this.id.substring(0, this.id.indexOf("-"));
+            $("#description").val(desc);
+            $("#price").val(price);
+            $("#displayPrice").html("$"+price / 100);
+        });
+    });
 </script>

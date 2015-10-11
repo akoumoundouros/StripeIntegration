@@ -3,11 +3,16 @@ using StripeIntegration.Models.ViewModels;
 using StripeIntegration.Services;
 using Stripe;
 using System.Collections.Generic;
+using StripeIntegration.Data;
+using System.Data.Entity;
+using System.Linq;
 
 namespace StripeIntegration.Controllers
 {
     public class HomeController : Controller
     {
+        
+
         private IEnumerable<StripeCharge> GetTransactions()
         {
             return new StripeChargeService(AppConfig.stripePrivateKey).List();
@@ -30,7 +35,7 @@ namespace StripeIntegration.Controllers
             StripeChargeCreateOptions myCharge = new StripeChargeCreateOptions()
             {
                 Currency = "aud",
-                Description = "Product x",
+                Description = model.cardDetails.description,
                 Amount = model.cardDetails.price,
                 Source = new StripeSourceOptions()
                 {
