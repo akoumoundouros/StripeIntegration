@@ -24,14 +24,13 @@ namespace StripeIntegration.Controllers
         [HttpPost]
         public ActionResult Index(HomeViewModel model)
         {
-            // Some code to determine price of purchase
-            model.cardDetails.price = 100;
 
             // Stripe charge logic
             StripeChargeService chargeService = new StripeChargeService(AppConfig.stripePrivateKey);
             StripeChargeCreateOptions myCharge = new StripeChargeCreateOptions()
             {
                 Currency = "aud",
+                Description = "Product x",
                 Amount = model.cardDetails.price,
                 Source = new StripeSourceOptions()
                 {
@@ -40,7 +39,7 @@ namespace StripeIntegration.Controllers
             };
             StripeCharge stripeCharge = chargeService.Create(myCharge);
 
-
+            model.transactions = GetTransactions();
 
             return View(model);
         }

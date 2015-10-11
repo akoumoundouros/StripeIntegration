@@ -17,7 +17,7 @@
         <div class="row">
             <div class="form-group ccDetails col-md-4">
                 <label for="CardNumber">Card number<span class="required">*</span></label>
-                <input type="text" name="CardNumber" id="txtCardNumber" placeholder="Card Number e.g 1234..." class="form-control" />
+                <input type="text" name="CardNumber" value="4242424242424242" id="txtCardNumber" placeholder="Card Number e.g 1234..." class="form-control" />
             </div>
         </div>
         <div class="row">
@@ -31,9 +31,9 @@
                 </select>
                 <select name="ExpiryYear" id="txtExpiryYear" class="form-control">
                     @{
-                        for (int i = DateTime.UtcNow.Year; i <= DateTime.UtcNow.Year + 15; i++)
+                        for (int i = DateTime.UtcNow.Year; i <= DateTime.UtcNow.Year + 5; i++)
                         {
-                            <option value="@i">@i</option>
+                            <option value="@i" @(i == 2017 ? "selected" : "") >@i</option>
                         }
                     }
                 </select>
@@ -44,7 +44,7 @@
             <div class="col-sm-2">
                 <div class="form-group ccDetails">
                     <label for="ccDetails.ccv">CCV<span class="required">*</span></label>
-                    <input type="text" name="Cvc" id="txtCvc" placeholder="e.g 987" class="form-control" />
+                    <input type="text" name="Cvc" id="txtCvc" placeholder="e.g 987" class="form-control" value="987"/>
                     <div class="formHint">
                         3 digit code on the back of your card
                     </div>
@@ -58,23 +58,27 @@
     </form>
 </div>
 
-<div class="container">
-    <h3>Transaction History</h3>
-    <div class="row">
-        <div class="col-md-6">
-            <table class="table table-striped">
-                <tr><th>Item</th><th>Cost</th></tr>
-                @foreach(var item in Model.transactions)
-                {
-                    <tr>
-                        <td>@item.Description</td>
-                        <td>@string.Format("${0:n}", item.Amount / 100)</td>
-                    </tr>
-                }
-            </table>
+@if (Model.transactions.Count() > 0)
+{
+    <div class="container">
+        <h3>Transaction History</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-striped">
+                    <tr><th>Item</th><th>Cost</th></tr>
+                    @foreach (var item in Model.transactions)
+                    {
+                        <tr>
+                            <td>@item.Description</td>
+                            <td>@string.Format("${0:n}", item.Amount / 100)</td>
+                        </tr>
+                    }
+                </table>
+            </div>
         </div>
     </div>
-</div>
+}
+
 
 <!-- Stripe Request Handler -->
 <script type="text/javascript">
