@@ -11,7 +11,7 @@
         <div class="row">
             <div class="form-group ccDetails col-md-4">
                 <label for="CardHolderName">Name as it appears on the card<span class="required">*</span></label>
-                @Html.TextBoxFor(m => m.CardHolderName, new { id = "txtCardHolderName", @class = "form-control" })
+                @Html.TextBoxFor(m => m.cardDetails.CardHolderName, new { id = "txtCardHolderName", @class = "form-control" })
             </div>
         </div>
         <div class="row">
@@ -54,8 +54,26 @@
         <div class="col-sm-4">
             <input onclick="getStripeToken()" value="Purchase" class="btn btn-danger" id="sendQuery" />
         </div>
-        @Html.HiddenFor(m => m.stripeToken, new { id = "hdnToken" })
+        @Html.HiddenFor(m => m.cardDetails.stripeToken, new { id = "hdnToken" })
     </form>
+</div>
+
+<div class="container">
+    <h3>Transaction History</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-striped">
+                <tr><th>Item</th><th>Cost</th></tr>
+                @foreach(var item in Model.transactions)
+                {
+                    <tr>
+                        <td>@item.Description</td>
+                        <td>@string.Format("${0:n}", item.Amount / 100)</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Stripe Request Handler -->
