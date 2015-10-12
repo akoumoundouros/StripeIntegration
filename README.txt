@@ -9,5 +9,6 @@ Configuration
 3. Copy these values into Services/AppConfig.cs
 
 Testing
-1. Run the project and enter the details of Stripe test cards https://stripe.com/docs/testing
-2. Check the Stripe dashboard payments page
+1. Run the project then select a product.
+2. Using the test CC details provided, click purchase.
+3. Check the Stripe dashboard payments page for payment confirmation.
